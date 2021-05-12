@@ -64,7 +64,7 @@ class SleepTrackerFragment : Fragment() {
         binding.clearButton.setOnClickListener { sleepTrackerViewModel.onClear() }
         /** Setting up LiveData nightsString observation relationship **/
         sleepTrackerViewModel.nightsString.observe(viewLifecycleOwner) { newNights ->
-            binding.textview.text = newNights
+//            binding.textview.text = newNights
         }
         sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner) { night ->
             night?.let {
@@ -97,6 +97,14 @@ class SleepTrackerFragment : Fragment() {
             }
         }
 
+        val adapter = SleepNightAdapter()
+        binding.sleepList.adapter = adapter
+
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner) { newNights ->
+            newNights?.apply {
+                adapter.data = newNights
+            }
+        }
 
         return binding.root
     }
