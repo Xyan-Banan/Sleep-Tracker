@@ -28,6 +28,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * A fragment with buttons to record start and end times for sleep, which are saved in
@@ -63,10 +64,10 @@ class SleepTrackerFragment : Fragment() {
         binding.stopButton.setOnClickListener { sleepTrackerViewModel.onStopTracking() }
         binding.clearButton.setOnClickListener { sleepTrackerViewModel.onClear() }
         /** Setting up LiveData nightsString observation relationship **/
-        sleepTrackerViewModel.nightsString.observe(viewLifecycleOwner, { newNights ->
+        sleepTrackerViewModel.nightsString.observe(viewLifecycleOwner) { newNights ->
             binding.textview.text = newNights
-        })
-        sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner, { night ->
+        }
+        sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner) { night ->
             night?.let {
                 this.findNavController().navigate(
                         SleepTrackerFragmentDirections
@@ -74,7 +75,7 @@ class SleepTrackerFragment : Fragment() {
                 sleepTrackerViewModel.doneNavigating()
             }
 
-        })
+        }
 
         sleepTrackerViewModel.startButtonVisible.observe(viewLifecycleOwner) { isEnabled ->
             binding.startButton.isEnabled = isEnabled
@@ -84,6 +85,17 @@ class SleepTrackerFragment : Fragment() {
         }
         sleepTrackerViewModel.clearButtonVisible.observe(viewLifecycleOwner) { isEnabled ->
             binding.clearButton.isEnabled = isEnabled
+        }
+
+        sleepTrackerViewModel.showSnackbarEvent.observe(viewLifecycleOwner) {
+            if (it) {
+                Snackbar.make(
+                        activity!!.findViewById(android.R.id.content),
+                        getString(R.string.cleared_message),
+                        Snackbar.LENGTH_SHORT
+                ).show()
+                sleepTrackerViewModel.doneShowingSnackbar()
+            }
         }
 
 
