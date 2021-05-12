@@ -76,6 +76,15 @@ class SleepTrackerFragment : Fragment() {
 
         })
 
+        sleepTrackerViewModel.startButtonVisible.observe(viewLifecycleOwner) { isEnabled ->
+            binding.startButton.isEnabled = isEnabled
+        }
+        sleepTrackerViewModel.stopButtonVisible.observe(viewLifecycleOwner) { isEnabled ->
+            binding.stopButton.isEnabled = isEnabled
+        }
+        sleepTrackerViewModel.clearButtonVisible.observe(viewLifecycleOwner) { isEnabled ->
+            binding.clearButton.isEnabled = isEnabled
+        }
 
 
         return binding.root
