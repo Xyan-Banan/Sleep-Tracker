@@ -17,7 +17,6 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
-import android.view.animation.Transformation
 import androidx.lifecycle.*
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
 import com.example.android.trackmysleepquality.database.SleepNight
@@ -31,16 +30,15 @@ class SleepTrackerViewModel(
         val database: SleepDatabaseDao,
         application: Application) : AndroidViewModel(application) {
 
-    private val viewModelJob = Job()
+//    private val viewModelJob = Job()
+//    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val tonight = MutableLiveData<SleepNight?>()
-    private val nights = database.getAllNights()
+    val nights = database.getAllNights()
 
     /**  Cool nights string */
     val nightsString = Transformations.map(nights) { nights ->
         formatNights(nights, application.resources)
-
     }
 
     val startButtonVisible = Transformations.map(tonight) { tonight ->
@@ -72,7 +70,7 @@ class SleepTrackerViewModel(
     }
 
     private fun initializeTonight() {
-        uiScope.launch {
+        viewModelScope.launch {
             tonight.value = getTonightFromDatabase()
         }
     }
@@ -88,7 +86,7 @@ class SleepTrackerViewModel(
     }
 
     fun onStartTracking() {
-        uiScope.launch {
+        viewModelScope.launch {
             val newNight = SleepNight()
             insertNightInDatabase(newNight)
             tonight.value = getTonightFromDatabase()
@@ -102,7 +100,7 @@ class SleepTrackerViewModel(
     }
 
     fun onStopTracking() {
-        uiScope.launch {
+        viewModelScope.launch {
             val oldNight = tonight.value ?: return@launch
             oldNight.endTimeMilli = System.currentTimeMillis()
             updateCurrentNight(oldNight)
@@ -121,22 +119,17 @@ class SleepTrackerViewModel(
     }
 
     fun onClear() {
-        uiScope.launch {
+        viewModelScope.launch {
             clear()
             tonight.value = null
-            _showSnackbarEvent.value = true
         }
+        _showSnackbarEvent.value = true
     }
 
     private suspend fun clear() {
         withContext(Dispatchers.IO) {
             database.clear()
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }
 
