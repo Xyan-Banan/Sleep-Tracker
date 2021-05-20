@@ -20,7 +20,7 @@ import com.example.android.trackmysleepquality.databinding.ListItemSleepNightBin
 class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(SleepNightDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(clickListener, getItem(position)!!)
+        holder.bind(clickListener, getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,13 +43,13 @@ class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<Sle
             }
         }
     }
+}
 
-    class SleepNightDiffCallback : DiffUtil.ItemCallback<SleepNight>() {
-        override fun areItemsTheSame(oldItem: SleepNight, newItem: SleepNight) = oldItem.nightId == newItem.nightId
-        override fun areContentsTheSame(oldItem: SleepNight, newItem: SleepNight) = oldItem == newItem
-    }
+class SleepNightDiffCallback : DiffUtil.ItemCallback<SleepNight>() {
+    override fun areItemsTheSame(oldItem: SleepNight, newItem: SleepNight) = oldItem.nightId == newItem.nightId
+    override fun areContentsTheSame(oldItem: SleepNight, newItem: SleepNight) = oldItem == newItem
+}
 
-    class SleepNightListener(val clickListener: (sleepId: Long) -> Unit) {
-        fun onClick(night: SleepNight) = clickListener(night.nightId)
-    }
+class SleepNightListener(val clickListener: (sleepId: Long) -> Unit) {
+    fun onClick(night: SleepNight) = clickListener(night.nightId)
 }

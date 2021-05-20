@@ -20,13 +20,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
@@ -51,7 +49,7 @@ class SleepTrackerFragment : Fragment() {
         val binding: FragmentSleepTrackerBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_sleep_tracker, container, false)
 
-        binding.sleepList.layoutManager = GridLayoutManager(activity,3)
+        binding.sleepList.layoutManager = GridLayoutManager(activity, 3)
         //For linear displaying of ViewHolders
 //        binding.sleepList.layoutManager = LinearLayoutManager(activity)
 
@@ -104,10 +102,20 @@ class SleepTrackerFragment : Fragment() {
             }
         }
 
-        val adapter = SleepNightAdapter(SleepNightAdapter.SleepNightListener { nightId ->
-            Toast.makeText(context, "${nightId} sleep night was clicked", Toast.LENGTH_LONG).show()
+        val adapter = SleepNightAdapter(SleepNightListener { nightId ->
+            sleepTrackerViewModel.onSleepNightClicked(nightId)
         })
         binding.sleepList.adapter = adapter
+
+        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner) { nightId ->
+            nightId?.let {
+
+                this.findNavController().navigate(
+                        SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepDetailFragment(nightId))
+                sleepTrackerViewModel.onSleepDataQualityNavigated()
+            }
+        }
+
 
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner) { newNights ->
             newNights?.let {
