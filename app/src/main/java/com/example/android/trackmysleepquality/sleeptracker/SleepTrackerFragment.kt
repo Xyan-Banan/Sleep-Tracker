@@ -48,8 +48,14 @@ class SleepTrackerFragment : Fragment() {
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentSleepTrackerBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_sleep_tracker, container, false)
-
-        binding.sleepList.layoutManager = GridLayoutManager(activity, 3)
+        val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup(){
+            override fun getSpanSize(position: Int) = when(position){
+                0 -> 3
+                else -> 1
+            }
+        }
+        binding.sleepList.layoutManager = manager
         //For linear displaying of ViewHolders
 //        binding.sleepList.layoutManager = LinearLayoutManager(activity)
 
@@ -119,7 +125,7 @@ class SleepTrackerFragment : Fragment() {
 
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner) { newNights ->
             newNights?.let {
-                adapter.submitList(it)
+                adapter.addHeaderAndSubmitList(it)
             }
         }
 
